@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/edensitko/myPortfolio.git'
+               git branch: 'main', url: 'https://github.com/edensitko/myPortfolio.git'
             }
         }
 
