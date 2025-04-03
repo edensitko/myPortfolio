@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-               git branch: 'main', url: 'https://github.com/edensitko/myPortfolio.git'
+                git branch: 'main', url: 'https://github.com/edensitko/myPortfolio.git'
             }
         }
 
@@ -21,11 +21,11 @@ pipeline {
         }
 
         stage('Push to DockerHub') {
-             steps {
+            steps {
                 withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')]) {
                     sh '''
-                        echo "$DOCKER_PASS" | docker login -u edensit139 --password-stdin
-                        docker push edensit139/eden-app:v1.0.0
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                        docker push "$DOCKERHUB_USER/$IMAGE_NAME:$VERSION"
                     '''
                 }
             }
