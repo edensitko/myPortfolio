@@ -7,6 +7,8 @@ pipeline {
         VERSION = 'v1.0.0'
     }
 
+    stages {
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$VERSION .'
@@ -28,6 +30,15 @@ pipeline {
             steps {
                 sh 'ansible-playbook deploy-playbook.yml -i inventory.ini'
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ הפרויקט נבנה והופץ בהצלחה!"
+        }
+        failure {
+            echo "❌ הבנייה נכשלה, בדוק את ה־Console Output."
         }
     }
 }
