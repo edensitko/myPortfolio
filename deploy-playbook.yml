@@ -1,0 +1,19 @@
+- name: Deploy Eden App
+  hosts: app_server
+  become: true
+
+  tasks:
+    - name: Pull Docker image
+      docker_image:
+        name: edensit139/eden-app
+        tag: v1.0.0
+        source: pull
+
+    - name: Run the container
+      docker_container:
+        name: eden-app
+        image: edensit139/eden-app:v1.0.0
+        state: started
+        restart_policy: always
+        ports:
+          - "80:80"
