@@ -7,13 +7,6 @@ pipeline {
         VERSION = 'v1.0.0'
     }
 
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git branch: 'main', url: 'https://github.com/edensitko/myPortfolio.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$VERSION .'
