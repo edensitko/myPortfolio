@@ -1,0 +1,11 @@
+- hosts: all
+  become: true
+  tasks:
+    - name: Pull Docker Image
+      shell: docker pull edensit139/eden-app:{{ image_tag }}
+
+    - name: Stop existing container
+      shell: docker rm -f eden-app || true
+
+    - name: Run new container
+      shell: docker run -d --name eden-app -p 80:80 edensit139/eden-app:{{ image_tag }}

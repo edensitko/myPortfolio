@@ -1,0 +1,51 @@
+"use client";
+
+import BlogComment from "@/src/components/blog/BlogComment";
+import BlogDescription from "@/src/components/blog/BlogDescription";
+import BlogHero from "@/src/components/blog/BlogHero";
+import Footer from "@/src/components/shared/Footer";
+import Layout from "@/layout/Layout";
+import { blogs } from "@/src/staticData/home/home";
+import { useEffect, useState } from "react";
+
+interface Blog {
+  image: {
+    thumbnail: string;
+    image: string;
+  };
+  date: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  slug: string;
+  category: string;
+  blogInfo?: any;
+}
+
+export default function ClientPage({ params }: { params: { slug: string } }) {
+  const [blog, setBlog] = useState<Blog | null>(null);
+
+  useEffect(() => {
+    const foundBlog = blogs?.blogsData?.find(
+      (project) => project?.slug === params?.slug
+    );
+    setBlog(foundBlog || null);
+  }, [params?.slug]);
+
+  return (
+    <Layout>
+      <div
+        className="py-3.5 max-w-content xl:max-2xl:max-w-50rem max-xl:mx-auto xl:ml-auto"
+        id="blog"
+      >
+        <div className="px-5 py-8 md:p-8 bg-white dark:bg-nightBlack rounded-2xl lg:p-10 2xl:p-13">
+          <BlogHero blog={blog} />
+
+          <BlogDescription blog={blog} />
+          <BlogComment />
+        </div>
+      </div>
+      <Footer />
+    </Layout>
+  );
+}
