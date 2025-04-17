@@ -1,32 +1,15 @@
-# ───── Stage 1: build the Next.js app ───────────────────────────────
+# build stage
 FROM node:18-alpine AS builder
-
-# מערכת קבצים מינימלית ובטוחה
 WORKDIR /app
-
-# התקנת תלויות רק לפי lock‑file
 COPY package*.json ./
-RUN npm ci --omit=dev          # מתקין production dependencies בלבד
-
-# העתקת קוד המקור ובנייה
+RUN npm ci
 COPY . .
-RUN npm run build              # יוצר .next/
+RUN npm run build              # <- מפעיל גם export => /app/out
 
-# ───── Stage 2: production image ────────────────────────────────────
+# runtime stage
 FROM node:18-alpine
-
-# תיקיית עבודה
 WORKDIR /app
-
-# התקנת pm2 (לא חובה, נוח לקריאות לוגים / restart)
-RUN npm install -g pm2
-
-# העתקת האפליקציה שנבנתה מה־builder
-COPY --from=builder /app ./
-
-# יציאת ברירת‑מחדל של Next.js (ניתן לשנות עם ‑p או env)
-ENV PORT=3000
-EXPOSE $PORT
-
-# הפקודה שמריצה SSR ‑ `next start`
-CMD ["pm2-runtime", "npm", "--", "start", "--", "-p", "3000"]
+RUN npm install -g serve
+COPY --from=builder /app/out ./out   # <- מעתיקים את תיקיית out עצמה
+EXPOSE 3000
+CMD ["serve", "-s", "out", "-l", "3000"]
