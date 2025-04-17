@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "npx serve -s out -l 3000",
+    "build": "next build && next export",
+    "start": "next start",
     "lint": "next lint",
     "export": "next export",
     "build-export": "next build && next export",
