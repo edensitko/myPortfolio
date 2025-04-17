@@ -1,21 +1,31 @@
-FROM node:18-alpine
-
-USER root
-
-RUN apk update && apk add --no-cache python3 py3-pip openssl ca-certificates && \
-    pip3 install --upgrade pip --break-system-packages && \
-    pip3 install ansible --break-system-packages
+# ---------- שלב Build ----------
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+# התקנת תלויות
+COPY package*.json ./
+RUN npm ci
 
-RUN npm ci --prefer-offline --no-audit
-
+# העתקת הקוד ובנייה
 COPY . .
+RUN npm run build        # יוצר .next  ו‑node_modules/production
 
-RUN npm run build
+# ---------- שלב Production ----------
+FROM node:18-alpine
+
+WORKDIR /app
+
+# רק תלויות Production הדרושות להפעלה
+COPY --from=builder /app/package*.json ./
+RUN npm ci --omit=dev    # מתקין רק prod‑deps
+
+# מעתיקים את הבילד ואת ה‑public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./next.config.js
 
 EXPOSE 3000
+ENV NODE_ENV=production
 
 CMD ["npm", "start"]
