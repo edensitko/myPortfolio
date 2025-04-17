@@ -1,15 +1,19 @@
-# build
-FROM node:18-alpine AS builder
+FROM node:18-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-COPY . .
-RUN npm run build && npm run export   # אם אתה משתמש ב‑npm run export
 
-# serve static
-FROM node:18-alpine
-RUN npm install -g serve
+FROM node:18-alpine AS builder
 WORKDIR /app
-COPY --from=builder /app/out ./out
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+# Production image
+FROM node:18-alpine
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app ./
+
 EXPOSE 3000
-CMD ["serve", "-s", "out", "-l", "3000"]
+CMD ["npm","start"]
